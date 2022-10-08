@@ -6,22 +6,27 @@ public class EnemySpawner : MonoBehaviour
 {
     [SerializeField] private GameObject enemyPrefab;
 
+    private List<GameObject> enemies = new List<GameObject>();
+
     void Start()
     {
         // Start the coroutine
         StartCoroutine(SpawnEnemies());
     }
 
-    private IEnumerator SpawnEnemies() {
-        while (true) {
+    private IEnumerator SpawnEnemies()
+    {
+        while (true)
+        {
             // Get a random position in the map
-            Vector3 randomPosition = new Vector3(Random.Range(-20, 20), 2, Random.Range(-20, 20));
+            Vector3 randomPosition = new Vector3(Random.Range(-23, 23), 20, Random.Range(-23, 23));
 
-            // Check if the position is empty
-            if (Physics.CheckSphere(randomPosition, 1f)) {
-                yield return new WaitForSeconds(.1f);
-            }
+            // Get the height at that position with a raycast
+            RaycastHit hit;
+            Physics.Raycast(randomPosition, Vector3.down, out hit);
+            randomPosition.y = hit.point.y + 1.3f;
             
+
             // Get a random rotation
             Quaternion randomRotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
 
@@ -31,7 +36,10 @@ public class EnemySpawner : MonoBehaviour
                 randomPosition,
                 randomRotation);
 
-            yield return new WaitForSeconds(.1f);
+            //yield return new WaitForSeconds(0f);
+            
+            // Continue if there are less than 10 enemies
+            yield return new WaitUntil(() => GameObject.FindGameObjectsWithTag("Enemy").Length < 10);
         }
     }
 }
